@@ -74,7 +74,7 @@ module ActsAsTaggableOn
       end
     end
 
-    def self.find_or_create_all_with_like_by_name(*list)
+    def self.find_or_create_all_with_like_by_name(*list, condition: nil)
       list = Array(list).flatten
 
       return [] if list.empty?
@@ -83,8 +83,12 @@ module ActsAsTaggableOn
       list.map do |tag_name|
         tries ||= 3
         comparable_tag_name = comparable_name(tag_name)
-        existing_tag = existing_tags.find { |tag| comparable_name(tag.name) == comparable_tag_name }
-        existing_tag || create(name: tag_name)
+        if condition.present?
+          existing_tag = existing_tags.where(crm_id: condition).find { |tag| comparable_name(tag.name) == comparable_tag_name }
+        else
+          existing_tag = existing_tags.find { |tag| comparable_name(tag.name) == comparable_tag_name }
+        end
+        existing_tag || create(name: tag_name, crm_id: condition)
       rescue ActiveRecord::RecordNotUnique
         if (tries -= 1).positive?
           ActiveRecord::Base.connection.execute 'ROLLBACK'

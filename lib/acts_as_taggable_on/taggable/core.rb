@@ -235,8 +235,8 @@ module ActsAsTaggableOn
 
       ##
       # Find existing tags or create non-existing tags
-      def load_tags(tag_list)
-        ActsAsTaggableOn::Tag.find_or_create_all_with_like_by_name(tag_list)
+      def load_tags(tag_list, condition)
+        ActsAsTaggableOn::Tag.find_or_create_all_with_like_by_name(tag_list, condition: condition)
       end
 
       def save_tags
@@ -247,7 +247,7 @@ module ActsAsTaggableOn
           tag_list = tag_list_cache_on(context).uniq
 
           # Find existing tags or create non-existing tags:
-          tags = find_or_create_tags_from_list_with_context(tag_list, context)
+          tags = find_or_create_tags_from_list_with_context(tag_list, context, try(:crm_id))
 
           # Tag objects for currently assigned tags
           current_tags = tags_on(context)
@@ -330,8 +330,8 @@ module ActsAsTaggableOn
       #
       # @param [Array<String>] tag_list Tags to find or create
       # @param [Symbol] context The tag context for the tag_list
-      def find_or_create_tags_from_list_with_context(tag_list, _context)
-        load_tags(tag_list)
+      def find_or_create_tags_from_list_with_context(tag_list, _context, condition)
+        load_tags(tag_list, condition)
       end
     end
   end

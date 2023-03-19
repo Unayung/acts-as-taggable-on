@@ -94,7 +94,7 @@ module ActsAsTaggableOn
         tagging_contexts.each do |context|
           cached_owned_tag_list_on(context).each do |owner, tag_list|
             # Find existing tags or create non-existing tags:
-            tags = find_or_create_tags_from_list_with_context(tag_list.uniq, context)
+            tags = find_or_create_tags_from_list_with_context(tag_list.uniq, context, try(:crm_id))
 
             # Tag objects for owned tags
             owned_tags = owner_tags_on(owner, context).to_a
